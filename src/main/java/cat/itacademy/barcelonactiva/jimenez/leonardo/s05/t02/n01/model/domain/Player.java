@@ -1,6 +1,5 @@
 package cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -11,6 +10,7 @@ import java.util.Date;
 public class Player {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
