@@ -5,6 +5,9 @@ import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.domain.Pl
 import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.dto.PlayerDTO;
 import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.services.PlayerService;
 import ch.qos.logback.classic.Logger;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +27,14 @@ public class PlayerController {
     @Autowired
     PlayerService playerService;
 
-    @PostMapping("/add")
-    public ResponseEntity<PlayerDTO> add(@RequestBody PlayerDTO playerDTO) {
-        logger.info("Calling add method");
+    @ApiOperation(value = "Create new player", notes = "Returns the created player")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created"),
+            @ApiResponse(code = 500, message = "Error when creating player")
+    })
+    @PostMapping()
+    public ResponseEntity<PlayerDTO> create(@RequestBody PlayerDTO playerDTO) {
+        logger.info("Calling create method");
         try {
             Player player = playerService.add(playerService.convertToEntity(playerDTO));
             return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
@@ -36,16 +44,22 @@ public class PlayerController {
 
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<PlayerDTO> update(@PathVariable("id") long id, @RequestBody PlayerDTO playerDetails) {
+    @ApiOperation(value = "Update new player", notes = "Returns the updated player")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created"),
+            @ApiResponse(code = 400, message = "Player not found")
+    })
+    @PutMapping()
+    public ResponseEntity<PlayerDTO> update(@RequestBody PlayerDTO playerDetails) {
         logger.info("Calling update method");
         try {
-            Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            Long idPlayer = playerDetails.getId();
+            Optional<Player> player = playerService.findById(idPlayer);
+            if (player.isPresent()) {
                 player.get().setName(playerDetails.getName());
                 player.get().setRegistrationDate(new Date());
                 playerService.update(player.get());
-                return new ResponseEntity<>(playerService.convertToDto(playerService.findById(id).get()),
+                return new ResponseEntity<>(playerService.convertToDto(playerService.findById(idPlayer).get()),
                         HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -55,6 +69,11 @@ public class PlayerController {
         }
     }
 
+    @ApiOperation(value = "Delete player by id", notes = "Return ok")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully deleted"),
+            @ApiResponse(code = 400, message = "Player not found")
+    })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<PlayerDTO> delete(@PathVariable("id") long id) {
         logger.info("Calling delete method");
@@ -71,6 +90,11 @@ public class PlayerController {
 
     }
 
+    @ApiOperation(value = "Get one player by id", notes = "Return the player information")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully found"),
+            @ApiResponse(code = 400, message = "Player not found")
+    })
     @GetMapping("/getOne/{id}")
     public ResponseEntity<PlayerDTO> getOne(@PathVariable("id") long id) {
         logger.info("Calling getOne method");
@@ -87,7 +111,12 @@ public class PlayerController {
         }
     }
 
-    @GetMapping("/getAll")
+    @ApiOperation(value = "Get all players", notes = "Return the player list")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully found"),
+            @ApiResponse(code = 500, message = "Error when retrieving players")
+    })
+    @GetMapping()
     public ResponseEntity<List<PlayerDTO>> getAll() {
         logger.info("Calling getAll method");
         try {
