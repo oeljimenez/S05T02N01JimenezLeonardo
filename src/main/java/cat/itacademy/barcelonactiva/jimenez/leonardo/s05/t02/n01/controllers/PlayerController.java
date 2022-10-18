@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/players")
+@CrossOrigin()
 public class PlayerController {
     Logger logger = (Logger) LoggerFactory.getLogger(PlayerController.class);
 
