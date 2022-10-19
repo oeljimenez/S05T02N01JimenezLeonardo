@@ -34,11 +34,16 @@ public class PlayerController {
             @ApiResponse(code = 500, message = "Error when creating player")
     })
     @PostMapping()
-    public ResponseEntity<PlayerDTO> create(@RequestBody PlayerDTO playerDTO) {
+    public ResponseEntity<?> create(@RequestBody PlayerDTO playerDTO) {
         logger.info("Calling create method");
         try {
-            Player player = playerService.add(playerService.convertToEntity(playerDTO));
-            return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
+            if (playerService.findByName(playerDTO.getName()) != null) {
+                return new ResponseEntity<String>("Player's name should be unique, please use another name",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                Player player = playerService.add(playerService.convertToEntity(playerDTO));
+                return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -58,7 +63,6 @@ public class PlayerController {
             Optional<Player> player = playerService.findById(idPlayer);
             if (player.isPresent()) {
                 player.get().setName(playerDetails.getName());
-                player.get().setRegistrationDate(new Date());
                 playerService.update(player.get());
                 return new ResponseEntity<>(playerService.convertToDto(playerService.findById(idPlayer).get()),
                         HttpStatus.OK);
@@ -68,6 +72,43 @@ public class PlayerController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @ApiOperation(value = "Player roll dice", notes = "Returns the result")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created"),
+            @ApiResponse(code = 500, message = "Error when creating player")
+    })
+    @PostMapping("/{id}/games")
+    public ResponseEntity<PlayerDTO> playDice(@PathVariable("id") long id) {
+        logger.info("Calling playDice method");
+        try {
+            Player player = new Player();
+            return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "Delete player by id", notes = "Return ok")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully deleted"),
+            @ApiResponse(code = 400, message = "Player not found")
+    })
+    @DeleteMapping("/{id}/games")
+    public ResponseEntity<PlayerDTO> deletePlayerGames(@PathVariable("id") long id) {
+        logger.info("Calling deletePlayerGames method");
+        try {
+            Optional<Player> player = playerService.findById(id);
+            if (id > 0 && player.isPresent()) {
+                playerService.deleteById(id);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @ApiOperation(value = "Delete player by id", notes = "Return ok")

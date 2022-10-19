@@ -44,6 +44,10 @@ public class PlayerServiveImpl implements PlayerService {
         return playerRepository.findAll();
     }
 
+    public Player findByName(String name) {
+        return playerRepository.findByName(name);
+    }
+
     public PlayerDTO convertToDto(Player player) {
         PlayerDTO playerDTO = ctx.getBean(ModelMapper.class).map(player, PlayerDTO.class);
         return playerDTO;
@@ -51,10 +55,8 @@ public class PlayerServiveImpl implements PlayerService {
 
     public Player convertToEntity(PlayerDTO playerDTO) {
         Player player = ctx.getBean(ModelMapper.class).map(playerDTO, Player.class);
-        System.out.println("converto entity-->" + playerDTO);
 
         if (playerDTO.getId() != null) {
-            System.out.println("converto entity-->" + playerDTO);
             player.setName(playerDTO.getName());
             player.setRegistrationDate(playerDTO.getRegistrationDate());
         }

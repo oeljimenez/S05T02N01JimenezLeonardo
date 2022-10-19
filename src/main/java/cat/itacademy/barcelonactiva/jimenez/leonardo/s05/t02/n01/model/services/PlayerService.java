@@ -17,6 +17,8 @@ public interface PlayerService {
 
     public List<Player> getAll();
 
+    public Player findByName(String name);
+
     public PlayerDTO convertToDto(Player post);
 
     public Player convertToEntity(PlayerDTO post);
