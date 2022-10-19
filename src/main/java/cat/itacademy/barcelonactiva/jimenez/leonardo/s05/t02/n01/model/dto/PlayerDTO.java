@@ -1,5 +1,6 @@
 package cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
@@ -10,6 +11,7 @@ public class PlayerDTO {
     @ApiModelProperty(notes = "Player name", example = "Leo", required = false)
     private String name;
     @ApiModelProperty(notes = "Registration Date", example = "2022-10-14 18:21:34", required = false)
+    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
     private Date registrationDate;
 
     public Long getId() {
