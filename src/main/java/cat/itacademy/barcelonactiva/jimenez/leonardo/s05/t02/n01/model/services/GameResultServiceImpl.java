@@ -13,7 +13,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GameResultServiceImpl implements GameResultService {
@@ -21,14 +20,25 @@ public class GameResultServiceImpl implements GameResultService {
     private GameResultRepository gameResultRepository;
     @Autowired
     private PlayerRepository playerRepository;
+
+    @Override
+    public void deleteGameResults(Long id) {
+        Player player = playerRepository.findById(id).get();
+        gameResultRepository.findByPlayer(player).stream().forEach(gameResult -> {
+            gameResultRepository.deleteById(gameResult.getId());
+        });
+        //deleting old success rating information
+        player.setSuccessRate(null);
+        playerRepository.save(player);
+    }
+
     @Override
     public List<GameResult> getPlayerGameResults(Long id) {
-        System.out.println("callinggetPlayerGameResults service impl ");
-
         return gameResultRepository.findByPlayer(playerRepository.findById(id).get());
     }
+
     ApplicationContext ctx = new AnnotationConfigApplicationContext(S05T01N01JimenezLeonardoSpringConfig.class);
-    
+
     public GameResultDTO convertToDto(GameResult gameResult) {
         GameResultDTO gameResultDTO = ctx.getBean(ModelMapper.class).map(gameResult, GameResultDTO.class);
         return gameResultDTO;
@@ -45,5 +55,5 @@ public class GameResultServiceImpl implements GameResultService {
 
         return gameResult;
     }
-   
+
 }

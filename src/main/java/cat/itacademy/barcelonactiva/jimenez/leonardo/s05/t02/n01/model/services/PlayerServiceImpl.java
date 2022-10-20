@@ -12,14 +12,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
-public class PlayerServiveImpl implements PlayerService {
+public class PlayerServiceImpl implements PlayerService {
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -60,54 +59,35 @@ public class PlayerServiveImpl implements PlayerService {
 
     @Override
     public void playDice(Long id) {
-        Optional<Player> optional = playerRepository.findById(id);
-        if (optional.isPresent()) {
-            System.out.println("playing dice service implentation");
-            Player player = optional.get();
-            GameResult gameResult = new GameResult();
-            Random random = new Random();
-            int diceOne = random.nextInt((7 - 1) + 1) + 1;
-            gameResult.setDiceOne(diceOne);
-            int diceTwo = random.nextInt((7 - 1) + 1) + 1;
-            gameResult.setDiceTwo(diceTwo);
-            if (diceOne + diceTwo == 7) {
-                gameResult.setWinner(Boolean.TRUE);
-            } else {
-                gameResult.setWinner(Boolean.FALSE);
-            }
-            gameResult.setPlayer(player);
-           // gameResultRepository.save(gameResult);
-
-            updateRate(player);
+        Player player = playerRepository.findById(id).get();
+        GameResult gameResult = new GameResult();
+        Random random = new Random();
+        int diceOne = random.nextInt((7 - 1) + 1) + 1;
+        gameResult.setDiceOne(diceOne);
+        int diceTwo = random.nextInt((7 - 1) + 1) + 1;
+        gameResult.setDiceTwo(diceTwo);
+        if (diceOne + diceTwo == 7) {
+            gameResult.setWinner(Boolean.TRUE);
+        } else {
+            gameResult.setWinner(Boolean.FALSE);
         }
+        gameResult.setPlayer(player);
+        gameResultRepository.save(gameResult);
+
+        updateSuccessRate(player);
     }
 
-    @Override
-    public void deleteGameResults(Long id) {
-        Optional<Player> optional = playerRepository.findById(id);
-        if (optional.isPresent()) {
-            Player player = optional.get();
-            gameResultRepository.findByPlayer(player).stream().forEach(gameResult -> {
-                gameResultRepository.deleteById(gameResult.getId());
-            });
-        }
-    }
-
-    public void updateRate(Player player) {
+    public void updateSuccessRate(Player player) {
         List<GameResult> gameResults = gameResultRepository.findByPlayer(player);
-        if(gameResults.size()>0){
-
-            int hits = gameResults.stream().filter(g-> Boolean.TRUE.equals(g.getWinner()))
+        if (gameResults.size() > 0) {
+            int hits = gameResults.stream().filter(g -> Boolean.TRUE.equals(g.getWinner()))
                     .collect(Collectors.toList()).size();
 
-            Double ratedo = (double) hits / gameResults.size() * 100.00;
-
-            player.setSuccessRate(ratedo);
+            Double percentage = (double) hits / gameResults.size() * 100.00;
+            player.setSuccessRate(percentage);
         }
-
         playerRepository.save(player);
     }
-
 
     public PlayerDTO convertToDto(Player player) {
         PlayerDTO playerDTO = ctx.getBean(ModelMapper.class).map(player, PlayerDTO.class);
@@ -121,8 +101,6 @@ public class PlayerServiveImpl implements PlayerService {
             player.setName(playerDTO.getName());
             player.setRegistrationDate(playerDTO.getRegistrationDate());
         }
-
         return player;
     }
-
 }

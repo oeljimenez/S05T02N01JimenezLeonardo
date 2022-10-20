@@ -18,7 +18,6 @@ public interface PlayerService {
     public List<Player> getAll();
 
     public void playDice(Long id);
-    public void deleteGameResults(Long id);
 
     public PlayerDTO convertToDto(Player player);
 

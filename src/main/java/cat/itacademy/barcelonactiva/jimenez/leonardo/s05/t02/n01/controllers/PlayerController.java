@@ -78,7 +78,7 @@ public class PlayerController {
         }
     }
 
-    @ApiOperation(value = "Player roll dice", notes = "Returns the result")
+    @ApiOperation(value = "Player roll dice", notes = "Return ok")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
             @ApiResponse(code = 500, message = "Error when creating player")
@@ -98,18 +98,18 @@ public class PlayerController {
         }
     }
 
-    @ApiOperation(value = "Delete player by id", notes = "Return ok")
+    @ApiOperation(value = "Delete player games results by id", notes = "Return ok")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully deleted"),
             @ApiResponse(code = 400, message = "Player not found")
     })
     @DeleteMapping("/{id}/games")
-    public ResponseEntity<PlayerDTO> deleteGameResults(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteGameResults(@PathVariable("id") long id) {
         logger.info("Calling deleteGameResults method");
         try {
             Optional<Player> player = playerService.findById(id);
             if (id > 0 && player.isPresent()) {
-                playerService.deleteGameResults(id);
+                gameResultService.deleteGameResults(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
