@@ -10,9 +10,12 @@ public class PlayerDTO {
     private Long id;
     @ApiModelProperty(notes = "Player name", example = "Leo", required = false)
     private String name;
-    @ApiModelProperty(notes = "Registration Date", example = "2022-10-14 18:21:34", required = false)
+    @ApiModelProperty(notes = "Registration Date", example = "2022-10-14 18:21:34")
     @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
     private Date registrationDate;
+    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
+    @ApiModelProperty(notes = "Player success rate", example = "25.25")
+    private Double successRate;
 
     public Long getId() {
         return id;
@@ -36,5 +39,13 @@ public class PlayerDTO {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public Double getSuccessRate() {
+        return successRate;
+    }
+
+    public void setSuccessRate(Double successRate) {
+        this.successRate = successRate;
     }
 }

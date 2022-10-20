@@ -1,8 +1,11 @@
 package cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.controllers;
 
 
+import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.domain.GameResult;
 import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.domain.Player;
+import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.dto.GameResultDTO;
 import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.dto.PlayerDTO;
+import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.services.GameResultService;
 import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.services.PlayerService;
 import ch.qos.logback.classic.Logger;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +30,8 @@ public class PlayerController {
     @Autowired
     PlayerService playerService;
 
-    private static final String ANONYMOUS_NAME = "ANÒNIM";
+    @Autowired
+    GameResultService gameResultService;
 
     @ApiOperation(value = "Create new player", notes = "Returns the created player")
     @ApiResponses(value = {
@@ -38,21 +42,16 @@ public class PlayerController {
     public ResponseEntity<?> create(@RequestBody PlayerDTO playerDTO) {
         logger.info("Calling create method");
         try {
-            if (playerDTO.getName().isBlank()) {
-                playerDTO.setName(ANONYMOUS_NAME);
-                Player player = playerService.add(playerService.convertToEntity(playerDTO));
+            Player player = playerService.add(playerService.convertToEntity(playerDTO));
+            if (player != null) {
                 return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
-            } else if (playerService.findByName(playerDTO.getName()) != null) {
+            } else {
                 return new ResponseEntity<String>("Player's name is already registered, please use another name",
                         HttpStatus.INTERNAL_SERVER_ERROR);
-            } else {
-                Player player = playerService.add(playerService.convertToEntity(playerDTO));
-                return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @ApiOperation(value = "Update new player", notes = "Returns the updated player")
@@ -85,11 +84,15 @@ public class PlayerController {
             @ApiResponse(code = 500, message = "Error when creating player")
     })
     @PostMapping("/{id}/games")
-    public ResponseEntity<PlayerDTO> playDice(@PathVariable("id") long id) {
+    public ResponseEntity<Void> playDice(@PathVariable("id") long id) {
         logger.info("Calling playDice method");
         try {
-            Player player = new Player();
-            return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
+            Optional<Player> player = playerService.findById(id);
+            if (id > 0 && player.isPresent()) {
+                playerService.playDice(id);
+                return new ResponseEntity<>(null, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -101,12 +104,12 @@ public class PlayerController {
             @ApiResponse(code = 400, message = "Player not found")
     })
     @DeleteMapping("/{id}/games")
-    public ResponseEntity<PlayerDTO> deletePlayerGames(@PathVariable("id") long id) {
-        logger.info("Calling deletePlayerGames method");
+    public ResponseEntity<PlayerDTO> deleteGameResults(@PathVariable("id") long id) {
+        logger.info("Calling deleteGameResults method");
         try {
             Optional<Player> player = playerService.findById(id);
             if (id > 0 && player.isPresent()) {
-                playerService.deleteById(id);
+                playerService.deleteGameResults(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -116,13 +119,44 @@ public class PlayerController {
 
     }
 
+    @ApiOperation(value = "Get all players with percentages", notes = "Return the player list")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully found"),
+            @ApiResponse(code = 500, message = "Error when retrieving players")
+    })
+    @GetMapping()
+    public ResponseEntity<List<PlayerDTO>> getAll() {
+        logger.info("Calling getAll method");
+        try {
+            return new ResponseEntity<>(playerService.getAll().stream().map(
+                    s -> playerService.convertToDto(s)).collect(Collectors.toList()), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}/games")
+    public ResponseEntity<List<GameResultDTO>> getPlayerGameResults(@PathVariable("id") long id) {
+        logger.info("Calling getAllGameResults method");
+        try {
+            Optional<Player> player = playerService.findById(id);
+            if (id > 0 && player.isPresent()) {
+                return new ResponseEntity<>(gameResultService.getPlayerGameResults(id).stream().map(
+                        s -> gameResultService.convertToDto(s)).collect(Collectors.toList()), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @ApiOperation(value = "Delete player by id", notes = "Return ok")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully deleted"),
             @ApiResponse(code = 400, message = "Player not found")
     })
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<PlayerDTO> delete(@PathVariable("id") long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
         logger.info("Calling delete method");
         try {
             Optional<Player> player = playerService.findById(id);
@@ -158,19 +192,5 @@ public class PlayerController {
         }
     }
 
-    @ApiOperation(value = "Get all players", notes = "Return the player list")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully found"),
-            @ApiResponse(code = 500, message = "Error when retrieving players")
-    })
-    @GetMapping()
-    public ResponseEntity<List<PlayerDTO>> getAll() {
-        logger.info("Calling getAll method");
-        try {
-            return new ResponseEntity<>(playerService.getAll().stream().map(
-                    s -> playerService.convertToDto(s)).collect(Collectors.toList()), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 }
