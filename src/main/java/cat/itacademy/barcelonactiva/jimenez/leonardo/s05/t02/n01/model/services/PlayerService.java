@@ -5,6 +5,7 @@ import cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01.model.dto.Playe
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 public interface PlayerService {
     public Player add(Player player) throws Exception;
@@ -18,6 +19,12 @@ public interface PlayerService {
     public List<Player> getAll();
 
     public void playDice(Long id);
+
+    public OptionalDouble getPlayersRanking ();
+
+    public Player getLoser ();
+
+    public Player getWinner ();
 
     public PlayerDTO convertToDto(Player player);
 

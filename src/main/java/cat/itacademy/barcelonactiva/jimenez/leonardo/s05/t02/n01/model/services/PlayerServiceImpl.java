@@ -12,9 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +73,24 @@ public class PlayerServiceImpl implements PlayerService {
         gameResultRepository.save(gameResult);
 
         updateSuccessRate(player);
+    }
+
+    @Override
+    public OptionalDouble getPlayersRanking() {
+        return playerRepository.findAll().stream().filter(x -> x.getSuccessRate() != null)
+                .mapToDouble(Player::getSuccessRate).average();
+    }
+
+    @Override
+    public Player getLoser() {
+        return playerRepository.findAll().stream().filter(x -> x.getSuccessRate() != null)
+                .min(Comparator.comparing(Player::getSuccessRate)).get();
+    }
+
+    @Override
+    public Player getWinner() {
+        return playerRepository.findAll().stream().filter(x -> x.getSuccessRate() != null)
+                .max(Comparator.comparing(Player::getSuccessRate)).get();
     }
 
     public void updateSuccessRate(Player player) {
