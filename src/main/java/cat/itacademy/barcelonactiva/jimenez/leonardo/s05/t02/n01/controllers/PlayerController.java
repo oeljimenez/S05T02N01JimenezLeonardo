@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +27,8 @@ public class PlayerController {
     @Autowired
     PlayerService playerService;
 
+    private static final String ANONYMOUS_NAME = "ANÒNIM";
+
     @ApiOperation(value = "Create new player", notes = "Returns the created player")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully created"),
@@ -37,8 +38,12 @@ public class PlayerController {
     public ResponseEntity<?> create(@RequestBody PlayerDTO playerDTO) {
         logger.info("Calling create method");
         try {
-            if (playerService.findByName(playerDTO.getName()) != null) {
-                return new ResponseEntity<String>("Player's name should be unique, please use another name",
+            if (playerDTO.getName().isBlank()) {
+                playerDTO.setName(ANONYMOUS_NAME);
+                Player player = playerService.add(playerService.convertToEntity(playerDTO));
+                return new ResponseEntity<>(playerService.convertToDto(player), HttpStatus.CREATED);
+            } else if (playerService.findByName(playerDTO.getName()) != null) {
+                return new ResponseEntity<String>("Player's name is already registered, please use another name",
                         HttpStatus.INTERNAL_SERVER_ERROR);
             } else {
                 Player player = playerService.add(playerService.convertToEntity(playerDTO));
