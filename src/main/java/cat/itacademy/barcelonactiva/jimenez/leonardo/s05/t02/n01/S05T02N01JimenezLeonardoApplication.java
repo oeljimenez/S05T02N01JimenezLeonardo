@@ -3,6 +3,7 @@ package cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t02.n01;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @SpringBootApplication
 @EnableSwagger2
+@EnableMongoAuditing
 public class S05T02N01JimenezLeonardoApplication {
 
     public static void main(String[] args) {

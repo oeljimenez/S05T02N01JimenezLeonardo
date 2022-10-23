@@ -12,19 +12,19 @@ public interface PlayerService {
 
     public void update(Player player);
 
-    public void deleteById(Long id);
+    public void deleteById(String id);
 
-    public Optional<Player> findById(Long id);
+    public Optional<Player> findById(String id);
 
     public List<Player> getAll();
 
-    public void playDice(Long id);
+    public void playDice(String id);
 
-    public OptionalDouble getPlayersRanking ();
+    public OptionalDouble getPlayersRanking();
 
-    public Player getLoser ();
+    public Player getLoser();
 
-    public Player getWinner ();
+    public Player getWinner();
 
     public PlayerDTO convertToDto(Player player);
 

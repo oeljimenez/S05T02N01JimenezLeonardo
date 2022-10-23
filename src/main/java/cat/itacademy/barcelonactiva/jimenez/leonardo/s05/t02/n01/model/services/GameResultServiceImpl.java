@@ -22,7 +22,7 @@ public class GameResultServiceImpl implements GameResultService {
     private PlayerRepository playerRepository;
 
     @Override
-    public void deleteGameResults(Long id) {
+    public void deleteGameResults(String id) {
         Player player = playerRepository.findById(id).get();
         gameResultRepository.findByPlayer(player).stream().forEach(gameResult -> {
             gameResultRepository.deleteById(gameResult.getId());
@@ -33,7 +33,7 @@ public class GameResultServiceImpl implements GameResultService {
     }
 
     @Override
-    public List<GameResult> getPlayerGameResults(Long id) {
+    public List<GameResult> getPlayerGameResults(String id) {
         return gameResultRepository.findByPlayer(playerRepository.findById(id).get());
     }
 

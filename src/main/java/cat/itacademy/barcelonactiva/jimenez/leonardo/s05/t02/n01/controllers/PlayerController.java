@@ -63,7 +63,7 @@ public class PlayerController {
     public ResponseEntity<PlayerDTO> update(@RequestBody PlayerDTO playerDetails) {
         logger.info("Calling update method");
         try {
-            Long idPlayer = playerDetails.getId();
+            String idPlayer = playerDetails.getId();
             Optional<Player> player = playerService.findById(idPlayer);
             if (player.isPresent()) {
                 player.get().setName(playerDetails.getName());
@@ -83,11 +83,11 @@ public class PlayerController {
             @ApiResponse(code = 500, message = "Error when creating player")
     })
     @PostMapping("/{id}/games")
-    public ResponseEntity<Void> playDice(@PathVariable("id") long id) {
+    public ResponseEntity<Void> playDice(@PathVariable("id") String id) {
         logger.info("Calling playDice method");
         try {
             Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            if (player.isPresent()) {
                 playerService.playDice(id);
                 return new ResponseEntity<>(null, HttpStatus.OK);
             }
@@ -103,11 +103,11 @@ public class PlayerController {
             @ApiResponse(code = 400, message = "Player not found")
     })
     @DeleteMapping("/{id}/games")
-    public ResponseEntity<Void> deleteGameResults(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteGameResults(@PathVariable("id") String id) {
         logger.info("Calling deleteGameResults method");
         try {
             Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            if (player.isPresent()) {
                 gameResultService.deleteGameResults(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -139,11 +139,11 @@ public class PlayerController {
             @ApiResponse(code = 400, message = "Player not found")
     })
     @GetMapping("/{id}/games")
-    public ResponseEntity<List<GameResultDTO>> getPlayerGameResults(@PathVariable("id") long id) {
+    public ResponseEntity<List<GameResultDTO>> getPlayerGameResults(@PathVariable("id") String id) {
         logger.info("Calling getAllGameResults method");
         try {
             Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            if (player.isPresent()) {
                 return new ResponseEntity<>(gameResultService.getPlayerGameResults(id).stream().map(
                         s -> gameResultService.convertToDto(s)).collect(Collectors.toList()), HttpStatus.OK);
             }
@@ -204,11 +204,11 @@ public class PlayerController {
             @ApiResponse(code = 400, message = "Player not found")
     })
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
         logger.info("Calling delete method");
         try {
             Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            if (player.isPresent()) {
                 playerService.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -224,11 +224,11 @@ public class PlayerController {
             @ApiResponse(code = 400, message = "Player not found")
     })
     @GetMapping("/getOne/{id}")
-    public ResponseEntity<PlayerDTO> getOne(@PathVariable("id") long id) {
+    public ResponseEntity<PlayerDTO> getOne(@PathVariable("id") String id) {
         logger.info("Calling getOne method");
         try {
             Optional<Player> player = playerService.findById(id);
-            if (id > 0 && player.isPresent()) {
+            if (player.isPresent()) {
                 playerService.findById(id);
                 return new ResponseEntity<>(playerService.convertToDto(playerService.findById(id).get()),
                         HttpStatus.OK);

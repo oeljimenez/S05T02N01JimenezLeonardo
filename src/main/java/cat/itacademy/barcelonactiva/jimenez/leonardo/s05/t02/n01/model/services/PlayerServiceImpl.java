@@ -43,11 +43,11 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         playerRepository.deleteById(id);
     }
 
-    public Optional<Player> findById(Long id) {
+    public Optional<Player> findById(String id) {
         return playerRepository.findById(id);
     }
 
@@ -56,7 +56,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public void playDice(Long id) {
+    public void playDice(String id) {
         Player player = playerRepository.findById(id).get();
         GameResult gameResult = new GameResult();
         Random random = new Random();
@@ -69,6 +69,7 @@ public class PlayerServiceImpl implements PlayerService {
         } else {
             gameResult.setWinner(Boolean.FALSE);
         }
+
         gameResult.setPlayer(player);
         gameResultRepository.save(gameResult);
 

@@ -7,21 +7,21 @@ import java.util.Date;
 
 public class PlayerDTO {
     @ApiModelProperty(notes = "Product ID", example = "1", required = false)
-    private Long id;
+    private String id;
     @ApiModelProperty(notes = "Player name", example = "Leo", required = false)
     private String name;
     @ApiModelProperty(notes = "Registration Date", example = "2022-10-14 18:21:34")
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
     private Date registrationDate;
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm", timezone = "Europe/Madrid")
     @ApiModelProperty(notes = "Player success rate", example = "25.25")
     private Double successRate;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

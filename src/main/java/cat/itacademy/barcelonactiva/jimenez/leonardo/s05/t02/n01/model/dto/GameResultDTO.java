@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class GameResultDTO {
 
     @ApiModelProperty(notes = "Product ID", example = "1", required = false)
-    private Long id;
+    private String id;
 
     @ApiModelProperty(notes = "Value Dice One", example = "2")
     private int diceOne;
@@ -16,11 +16,11 @@ public class GameResultDTO {
     @ApiModelProperty(notes = "Player game result", example = "true")
     private Boolean winner;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
